@@ -69,7 +69,9 @@ module.exports.resetPassword = async (req, res) => {
   } catch (error) {
     console.log("====================================");
     console.log(error);
-    return res.status(200).json({ message: "Erreur bro : " + error.message });
+    return res
+      .status(200)
+      .json({ message: "Erreur avec l'email bro : " + error.message });
     console.log("====================================");
   }
 };
