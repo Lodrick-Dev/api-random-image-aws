@@ -4,14 +4,16 @@ const userSchema = new mongoose.Schema({
   pseudo: {
     type: String,
     required: true,
+    unique: true,
   },
   email: {
     type: String,
     required: true,
+    unique: true,
   },
   reactionsimages: {
     //chaque fois que l'utilisateur like,
-    //le nom unique de l'image vont ici et la reaction de l'utilisateur aussi
+    //le nom unique de l'image vont ici et la reaction de l'utilisateur aussi(like, haha, no haha)
     type: [
       {
         nameimage: String,

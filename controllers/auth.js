@@ -1,19 +1,27 @@
 const sendCustomVerificationEmail = require("../middleware/bodyEmailToCheck");
 const sendCustomPasswordResetEmail = require("../middleware/bodyEmailToPasswordInit");
 const adminFirebaseInit = require("../middleware/firebase");
+const UserModel = require("../models/user.model");
 
 //resgiter post firebase
-module.exports.registerUser = async (req, res) => {
-  const { email, password, code } = req.body;
-  if (!email || !password || !code)
-    return res
-      .status(200)
-      .json({ message: "Erreur : Bro les champs sont obligatoire" });
+module.exports.registerUser = async (req, res, next) => {
+  const { pseudo, email, password, code } = req.body;
+  // if (!pseudo || !email || !password || !code)
+  //   return res
+  //     .status(200)
+  //     .json({ message: "Erreur : Bro les champs sont obligatoire" });
 
-  if (code !== process.env.CODE_ACCESS)
-    return res
-      .status(200)
-      .json({ message: "Erreur : Bro le code d'accès est incorrect" });
+  // return;
+  // if (code !== process.env.CODE_ACCESS)
+  //   return res
+  //     .status(200)
+  //     .json({ message: "Erreur : Bro le code d'accès est incorrect" });
+  //firebase 👇
+  console.log(
+    `je suis là et voici tes valeurs ${pseudo} ${email} ${password} ${code}`
+  );
+  res.status(200).json({ message: "Erreur : test" });
+  return;
   try {
     await adminFirebaseInit
       .auth()
