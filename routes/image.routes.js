@@ -5,8 +5,12 @@ const {
   deleteImg,
   getOneRandom,
   getAll,
+  reactionUserOnImage,
 } = require("../controllers/image.aws");
-const { checkTokenAndAllow } = require("../middleware/beforeAnyAction");
+const {
+  checkTokenAndAllow,
+  checkTokenPublic,
+} = require("../middleware/beforeAnyAction");
 
 const fileFilterImg = (req, file, cb) => {
   if (
@@ -40,9 +44,11 @@ router.post(
 //ici aussi y a doit avoir des middleware
 router.delete("/admin/delete/image", checkTokenAndAllow, deleteImg);
 //ici aussi middleware
-router.get("/admin/all/images", getAll);
+router.get("/admin/all/images", checkTokenAndAllow, getAll);
 
-//no middlewar
+// call on piece random - PUBLIC
 router.get("/random/image", getOneRandom);
+//action like REACTION - PUBLIC -- check if connecté (middleware)
+router.put("/react/image", checkTokenPublic, reactionUserOnImage);
 
 module.exports = router;

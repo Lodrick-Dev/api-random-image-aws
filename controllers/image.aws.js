@@ -1,3 +1,4 @@
+const ImageModel = require("../models/image.model");
 const {
   deleteImgAws,
   uploadImgAws,
@@ -61,5 +62,64 @@ module.exports.getOneRandom = async (req, res) => {
     console.log("=====dans get on random controller=======");
     console.log(error);
     console.log("====================================");
+  }
+};
+
+//put reaction - token nameimage emailuser react
+module.exports.reactionUserOnImage = async (req, res) => {
+  const { id, emailuser, react } = req.body;
+
+  try {
+    // Trouver l'image par ID
+    const image = await ImageModel.findById(id);
+
+    // Vérifier si l'image existe
+    if (!image) {
+      return res
+        .status(200)
+        .json({ message: "Erreur : Identification de l'image impossible" });
+    }
+
+    // Vérifier si l'utilisateur a déjà réagi
+    const userAlreadyReacted = image.reactionsusers.some(
+      (reaction) => reaction.emailuser === emailuser
+    );
+
+    if (userAlreadyReacted) {
+      // L'utilisateur a déjà réagi, mise à jour de sa réaction
+      try {
+        await ImageModel.updateOne(
+          { _id: image._id, "reactionsusers.emailuser": emailuser },
+          { $set: { "reactionsusers.$.reaction": react } }
+        );
+      } catch (error) {
+        console.log(
+          "Erreur lors de la mise à jour de la réaction de l'utilisateur : " +
+            error
+        );
+      }
+    } else {
+      // L'utilisateur n'a pas encore réagi, ajouter sa réaction
+      try {
+        await ImageModel.updateOne(
+          { _id: image._id },
+          { $push: { reactionsusers: { emailuser, reaction: react } } }
+        );
+      } catch (error) {
+        console.log("Erreur si l'utilisateur n'a pas encore réagi : " + error);
+      }
+    }
+
+    return res
+      .status(200)
+      .json({ message: "Réaction de l'utilisateur mise à jour avec succès" });
+  } catch (error) {
+    console.log(
+      "Erreur lors de la gestion de la réaction de l'utilisateur : " + error
+    );
+    return res.status(500).json({
+      message:
+        "Erreur serveur lors de la gestion de la réaction de l'utilisateur",
+    });
   }
 };

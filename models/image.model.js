@@ -7,14 +7,13 @@ const imageSchema = new mongoose.Schema({
   reactionsusers: {
     type: [
       {
-        nameuser: String,
+        emailuser: {
+          type: String,
+          unique: true,
+        },
         reaction: String,
       },
     ],
-    default: [],
-  },
-  share: {
-    type: [String],
     default: [],
   },
 });
