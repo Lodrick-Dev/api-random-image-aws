@@ -101,6 +101,3 @@ module.exports.deleteUser = async (req, res) => {
     return res.status(200).json({ message: error.message });
   }
 };
-
-//post /confirmationUser (before delete); NOTE USE
-module.exports.confirmationUser = async (req, res) => {};

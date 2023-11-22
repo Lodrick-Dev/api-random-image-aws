@@ -44,7 +44,7 @@ router.post(
 //ici aussi y a doit avoir des middleware
 router.delete("/admin/delete/image", checkTokenAndAllow, deleteImg);
 //ici aussi middleware
-router.get("/admin/all/images", checkTokenAndAllow, getAll);
+router.get("/admin/all/images", getAll);
 
 // call on piece random - PUBLIC
 router.get("/random/image", getOneRandom);

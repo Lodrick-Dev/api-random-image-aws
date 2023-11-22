@@ -12,8 +12,14 @@ module.exports.checkTokenAndAllow = async (req, res, next) => {
     //ceci nous permet de d'obtenir tous les infos de l'user
     // donc si on const {user} = req on aura le user
     req.user = decodedToken;
-    //vérification si autorisé 👇
     const user = req.user;
+    //check if email vérified
+    // console.log(user);
+    if (!user.email_verified)
+      return res
+        .status(200)
+        .json({ message: "Erreur: Veuillez vérifier votre mail" });
+    //vérification si autorisé 👇
     if (user.email !== process.env.EMAIL_ACCESS)
       return res.status(200).json({ message: "Erreur : Accès non autorisé" });
     next();
@@ -38,6 +44,8 @@ module.exports.checkTokenPublic = async (req, res, next) => {
     //ceci nous permet de d'obtenir tous les infos de l'user
     // donc si on const {user} = req on aura le user
     req.user = decodedToken;
+    const user = req.user;
+    console.log(user);
     //vérification si autorisé 👇
     next();
   } catch (error) {

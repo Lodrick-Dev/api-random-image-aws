@@ -12,7 +12,7 @@ function sendCustomVerificationEmail(
     from: process.env.GMAIL_MAIL,
     to: userEmail,
     subject: "Vérification d'e-mail",
-    text: `Bonjour ${displayName}! Cliquez sur le lien suivant pour vérifier votre adresse e-mail: ${verificationLink}`,
+    text: `Bonjour ${displayName}! Une fois votre adresse e-mail vérifiée, veuillez vous reconnecter. Cliquez sur le lien suivant pour vérifier votre adresse e-mail :  ${verificationLink}`,
     replyTo: "noreply@snap-boum.fr",
   };
 
@@ -23,7 +23,10 @@ function sendCustomVerificationEmail(
       throw error;
     } else {
       console.log("E-mail envoyé :", info.response);
-      return res.status(200).json({ message: "Email envoyé avec succès" });
+      return res.status(200).json({
+        message:
+          "Un message de vérification a été envoyé ! Veuillez vous reconnecter.",
+      });
     }
   });
 }
