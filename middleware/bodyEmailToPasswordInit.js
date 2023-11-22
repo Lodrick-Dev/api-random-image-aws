@@ -6,6 +6,7 @@ function sendCustomPasswordResetEmail(email, link, res) {
     to: email,
     subject: "Mise à jour de votre mot de passe",
     text: `Bonjour ! Cliquez sur le lien suivant pour modifier votre mot de passe: ${link}`,
+    replyTo: "noreply@snap-boum.com",
   };
 
   // Envoyer l'e-mail

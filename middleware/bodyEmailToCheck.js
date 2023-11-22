@@ -13,6 +13,7 @@ function sendCustomVerificationEmail(
     to: userEmail,
     subject: "Vérification d'e-mail",
     text: `Bonjour ${displayName}! Cliquez sur le lien suivant pour vérifier votre adresse e-mail: ${verificationLink}`,
+    replyTo: "noreply@snap-boum.fr",
   };
 
   // Envoyer l'e-mail
