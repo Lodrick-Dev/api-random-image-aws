@@ -1,34 +1,17 @@
 const sendCustomVerificationEmail = require("../middleware/bodyEmailToCheck");
 const sendCustomPasswordResetEmail = require("../middleware/bodyEmailToPasswordInit");
 const adminFirebaseInit = require("../middleware/firebase");
-const UserModel = require("../models/user.model");
 
-//resgiter post firebase
-module.exports.registerUser = async (req, res, next) => {
-  const { pseudo, email, password, code } = req.body;
-  // if (!pseudo || !email || !password || !code)
-  //   return res
-  //     .status(200)
-  //     .json({ message: "Erreur : Bro les champs sont obligatoire" });
-
-  // return;
-  // if (code !== process.env.CODE_ACCESS)
-  //   return res
-  //     .status(200)
-  //     .json({ message: "Erreur : Bro le code d'accès est incorrect" });
-  //firebase 👇
-  console.log(
-    `je suis là et voici tes valeurs ${pseudo} ${email} ${password} ${code}`
-  );
-  res.status(200).json({ message: "Erreur : test" });
-  return;
+//resgiter post FIREBASE ADMIN
+module.exports.registerUserAdmin = async (req, res, next) => {
+  const { pseudo, email, password } = req.body;
   try {
     await adminFirebaseInit
       .auth()
       .createUser({
         email: email,
         password: password,
-        displayName: "Marc Doe",
+        displayName: pseudo,
       })
       .then((userRecord) => {
         console.log(`Succès create user : ${userRecord.uid}`);
@@ -81,5 +64,28 @@ module.exports.resetPassword = async (req, res) => {
       .status(200)
       .json({ message: "Erreur avec l'email bro : " + error.message });
     console.log("====================================");
+  }
+};
+
+//post register PUBLIC -FIREBASE
+module.exports.registerUserPublic = async (req, res, next) => {
+  const { pseudo, email } = req.body;
+  try {
+    await adminFirebaseInit
+      .auth()
+      .createUser({
+        email: email,
+        password: password,
+        displayName: pseudo,
+      })
+      .then((userRecord) => {
+        console.log(`Succès create user : ${userRecord.uid}`);
+        return res
+          .status(200)
+          .json({ message: `Nouvel utilisateur créé, connectez-vous` });
+      });
+  } catch (error) {
+    //email not valid / password too short / email exist
+    return res.status(200).json({ message: "Erreur bro : " + error.message });
   }
 };
