@@ -8,10 +8,8 @@ const s3 = new AWS.S3({
 });
 
 //to send in aws s3
-module.exports.uploadImgAws = async (file) => {
+module.exports.uploadImgAws = async (file, nameUnik) => {
   const resizeImg = await sharp(file.buffer).resize(1080, 1080).toBuffer();
-  const beforeName = Date.now();
-  const nameUnik = beforeName.toString();
   const params = {
     Bucket: "image-random",
     Key: `api-random-img-${nameUnik}.jpg`,

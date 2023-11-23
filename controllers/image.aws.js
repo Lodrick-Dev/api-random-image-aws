@@ -9,7 +9,7 @@ const {
 //uplaod image
 module.exports.uploadImg = async (req, res) => {
   console.log("====================================");
-  console.log(req.file);
+  // console.log(req.file);
   console.log("====================================");
   if (!req.file) {
     return res
@@ -17,7 +17,13 @@ module.exports.uploadImg = async (req, res) => {
       .json({ message: "Erreur: Aucune image selectionnée" });
   }
   try {
-    await uploadImgAws(req.file);
+    const beforeName = Date.now();
+    const nameUnik = beforeName.toString();
+    await uploadImgAws(req.file, nameUnik); //in aws
+    //in mongoDb
+    await ImageModel.create({
+      nameimage: `api-random-img-${nameUnik}.jpg`,
+    });
     return res.status(200).json({ message: "Image envoyé avec succès" });
   } catch (error) {
     console.log("Ici upload du s3");
@@ -33,8 +39,21 @@ module.exports.deleteImg = async (req, res) => {
   const { name } = req.body;
   if (!name) return res.status(200).json({ message: `Le nom est introuvable` });
   try {
-    await deleteImgAws(name);
-    return res.status(200).json({ message: "Image supprimée avec succès" });
+    const image = await ImageModel.findOne({ nameimage: name });
+    if (!image)
+      return res
+        .status(200)
+        .json({ message: "Erreur : Objet non trouvé dans la base de donnée" });
+    const deleteInAwsAndDataBase = async () => {
+      try {
+        await deleteImgAws(name);
+        await image.deleteOne();
+        return res.status(200).json({ message: "Image supprimée avec succès" });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    await deleteInAwsAndDataBase();
   } catch (error) {
     console.log("====================================");
     console.log(error);
