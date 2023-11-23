@@ -14,6 +14,20 @@ const imageSchema = new mongoose.Schema({
         reaction: String,
       },
     ],
+    required: false,
+    default: [],
+  },
+  commentairessusers: {
+    type: [
+      {
+        emailuser: {
+          type: String,
+          unique: true,
+        },
+        commentaire: String,
+      },
+    ],
+    required: false,
     default: [],
   },
 });
