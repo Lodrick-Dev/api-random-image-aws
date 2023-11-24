@@ -1,4 +1,5 @@
 const adminFirebaseInit = require("../middleware/firebase");
+const UserModel = require("../models/user.model");
 
 //get /user oneUser
 module.exports.getUserId = async (req, res) => {
@@ -83,19 +84,37 @@ module.exports.getAllUsers = async (req, res) => {
   listAllUsers();
 };
 
-//delete /delete
+//delete /delete mongo - firebase
 module.exports.deleteUser = async (req, res) => {
-  const { id } = req.body;
-  if (!id) return res.status(200).json({ message: `Un id est nécessaire` });
+  const { id, email } = req.body;
+  if (!id || !email)
+    return res.status(200).json({
+      message: `Erreur : Un id et email nécessaires pour supprimer un utilisateur`,
+    });
   try {
-    await adminFirebaseInit
-      .auth()
-      .deleteUser(id)
-      .then(() => {
-        return res.status(200).json({ message: `${id} supprimé avec succè` });
-      });
+    const userMongo = await UserModel.findOne({ email: email });
+    if (!userMongo)
+      return res
+        .status(200)
+        .json({ message: "Erreur : Email non trouvé dans mongoDB" });
+    const deleteUserInAwsThenMongo = async () => {
+      try {
+        await adminFirebaseInit.auth().deleteUser(id);
+        await userMongo.deleteOne().then(() => {
+          return res.status(200).json({
+            message: `Utilisateur : ${email} avec l'id : ${id} supprimé avec succès`,
+          });
+        });
+      } catch (error) {
+        console.log(error);
+        return res
+          .status(200)
+          .json({ message: "Erreur : Erreur critique dans aws et mongo" });
+      }
+    };
+    await deleteUserInAwsThenMongo();
   } catch (error) {
-    console.log("====================================");
+    console.log("==============firebas ou mongo======================");
     console.log(error);
     console.log("====================================");
     return res.status(200).json({ message: error.message });
