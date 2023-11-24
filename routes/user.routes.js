@@ -1,7 +1,6 @@
 const {
   getUserId,
   deleteUser,
-  confirmationUser,
   getAllUsers,
   getUserByEmailSend,
 } = require("../controllers/user");

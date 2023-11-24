@@ -92,7 +92,28 @@ module.exports.checkInDataBaseBeforeRegister = async (req, res, next) => {
 };
 
 module.exports.checkInDataBaseBeforeRegisterPublic = async (req, res, next) => {
-  const { pseudo, email } = req.body;
+  const emailregex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const { pseudo, email, password } = req.body;
+  if (!pseudo || !email || !password)
+    return res
+      .status(200)
+      .json({ message: "Erreur : Les champs sont obligatoires" });
+
+  if (pseudo.length < 3)
+    return res
+      .status(200)
+      .json({ message: "Erreur : Pseudo trop court, min 3 caractères" });
+
+  if (password.length < 7)
+    return res
+      .status(200)
+      .json({ message: "Erreur: Mot de passe trop court, min 7 caractères" });
+
+  if (!emailregex.test(email))
+    return res
+      .status(200)
+      .json({ message: "Erreur : E-Mail n'est pas valide" });
+
   try {
     await UserModel.create({
       pseudo,
