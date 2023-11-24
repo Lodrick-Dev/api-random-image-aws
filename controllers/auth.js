@@ -86,6 +86,11 @@ module.exports.registerUserPublic = async (req, res, next) => {
       });
   } catch (error) {
     //email not valid / password too short / email exist
-    return res.status(200).json({ message: "Erreur bro : " + error.message });
+    return res
+      .status(200)
+      .json({
+        message:
+          "Erreur bro : Erreur critique au niveau de Firebase" + error.message,
+      });
   }
 };
