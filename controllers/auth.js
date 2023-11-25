@@ -69,7 +69,7 @@ module.exports.resetPassword = async (req, res) => {
 
 //post register PUBLIC -FIREBASE
 module.exports.registerUserPublic = async (req, res, next) => {
-  const { pseudo, email } = req.body;
+  const { pseudo, email, password } = req.body;
   try {
     await adminFirebaseInit
       .auth()
@@ -86,11 +86,10 @@ module.exports.registerUserPublic = async (req, res, next) => {
       });
   } catch (error) {
     //email not valid / password too short / email exist
-    return res
-      .status(200)
-      .json({
-        message:
-          "Erreur bro : Erreur critique au niveau de Firebase" + error.message,
-      });
+    console.log(error);
+    return res.status(200).json({
+      message:
+        "Erreur bro : Erreur critique au niveau de Firebase" + error.message,
+    });
   }
 };
