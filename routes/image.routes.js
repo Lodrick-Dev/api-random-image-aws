@@ -6,6 +6,7 @@ const {
   getOneRandom,
   getAll,
   reactionUserOnImage,
+  getOneImageMongo,
 } = require("../controllers/image.aws");
 const {
   checkTokenAndAllow,
@@ -46,8 +47,10 @@ router.delete("/admin/delete/image", checkTokenAndAllow, deleteImg);
 //ici aussi middleware
 router.get("/admin/all/images", getAll);
 
-// call on piece random - PUBLIC
+// call on piece random - PUBLIC AWS
 router.get("/random/image", getOneRandom);
+//call on piece random - to PUBLIC from MONGO
+router.get("/random/one/image", getOneImageMongo);
 //action like REACTION - PUBLIC -- check if connecté (middleware)
 router.put("/react/image", checkTokenPublic, reactionUserOnImage);
 

@@ -22,7 +22,7 @@ module.exports.uploadImg = async (req, res) => {
     await uploadImgAws(req.file, nameUnik); //in aws
     //in mongoDb
     await ImageModel.create({
-      nameimage: `api-random-img-${nameUnik}.jpg`,
+      nameimage: `https://image-random.s3.eu-west-3.amazonaws.com/api-random-img-${nameUnik}.jpg`,
     });
     return res.status(200).json({ message: "Image envoyé avec succès" });
   } catch (error) {
@@ -214,3 +214,6 @@ module.exports.reactionUserOnImageOrPullReaction = async (req, res) => {
     });
   }
 };
+
+//one random image from mongoDB
+module.exports.getOneImageMongo = async (req, res) => {};
