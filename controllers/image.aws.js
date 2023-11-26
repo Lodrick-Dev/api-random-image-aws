@@ -86,11 +86,11 @@ module.exports.getOneRandom = async (req, res) => {
 
 //put reaction - token nameimage emailuser react
 module.exports.reactionUserOnImage = async (req, res) => {
-  const { id, emailuser, react } = req.body;
+  const { idimgmongo, emailuser, react } = req.body;
 
   try {
     // Trouver l'image par ID
-    const image = await ImageModel.findById(id);
+    const image = await ImageModel.findById(idimgmongo);
 
     // Vérifier si l'image existe
     if (!image) {
@@ -107,15 +107,28 @@ module.exports.reactionUserOnImage = async (req, res) => {
     if (userAlreadyReacted) {
       // L'utilisateur a déjà réagi, mise à jour de sa réaction
       try {
+        let updateQuery;
+        if (react === "unlike") {
+          // Si la réaction est "unlike", supprimer l'objet pour cet utilisateur
+          updateQuery = { $pull: { reactionsusers: { emailuser } } };
+        } else {
+          // Si la réaction n'est pas "unlike", mettre à jour la réaction
+          updateQuery = { $set: { "reactionsusers.$.reaction": react } };
+        }
         await ImageModel.updateOne(
           { _id: image._id, "reactionsusers.emailuser": emailuser },
-          { $set: { "reactionsusers.$.reaction": react } }
+          updateQuery
+          // { $set: { "reactionsusers.$.reaction": react } }
         );
+        return res.status(200).json({ message: "ok" });
       } catch (error) {
         console.log(
           "Erreur lors de la mise à jour de la réaction de l'utilisateur : " +
             error
         );
+        return res
+          .status(200)
+          .json({ message: "Erreur lors de la mise à jour de la reaction" });
       }
     } else {
       // L'utilisateur n'a pas encore réagi, ajouter sa réaction
@@ -124,6 +137,7 @@ module.exports.reactionUserOnImage = async (req, res) => {
           { _id: image._id },
           { $push: { reactionsusers: { emailuser, reaction: react } } }
         );
+        return res.status(200).json({ message: "ok" });
       } catch (error) {
         console.log("Erreur si l'utilisateur n'a pas encore réagi : " + error);
       }
