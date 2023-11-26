@@ -1,17 +1,24 @@
 const adminFirebaseInit = require("../middleware/firebase");
 const UserModel = require("../models/user.model");
 
-//get /user oneUser
+//get /user oneUser check in firebase then in mongo DB
 module.exports.getUserId = async (req, res) => {
   const { id } = req.params;
   if (!id) return res.status(200).json({ message: "Id inconnu" });
   try {
-    await adminFirebaseInit
-      .auth()
-      .getUser(id)
-      .then((userRecord) => {
-        return res.status(200).send(userRecord);
+    const userRecord = await adminFirebaseInit.auth().getUser(id);
+    console.log(userRecord.email);
+    if (!userRecord)
+      return res
+        .status(200)
+        .json({ message: "Erreur : Utilisateur introuvable" });
+    const userMongo = await UserModel.findOne({ email: userRecord.email });
+    if (!userMongo)
+      return res.status(200).json({
+        message: "Erreur : Utilisateur introuvable dans notre base de donnée",
       });
+
+    return res.status(200).send(userMongo);
   } catch (error) {
     console.log("====================================");
     console.log(error);
@@ -25,12 +32,8 @@ module.exports.getUserByEmailSend = async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(200).json({ message: "Champs obligatoire" });
   try {
-    await adminFirebaseInit
-      .auth()
-      .getUserByEmail(email)
-      .then((userRecord) => {
-        return res.status(200).send(userRecord);
-      });
+    const userRecord = await adminFirebaseInit.auth().getUserByEmail(email);
+    return res.status(200).send(userRecord);
   } catch (error) {
     console.log("====================================");
     console.log();
