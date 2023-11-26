@@ -4,6 +4,7 @@ const {
   getAllUsers,
   getUserByEmailSend,
   updateUser,
+  deleteUserCurrent,
 } = require("../controllers/user");
 const { checkTokenAndAllow } = require("../middleware/beforeAnyAction");
 
@@ -14,5 +15,6 @@ router.put("/update/:id", updateUser); //un middleware avec le token ici
 router.post("/email", checkTokenAndAllow, getUserByEmailSend);
 router.get("/all", checkTokenAndAllow, getAllUsers);
 router.delete("/delete", checkTokenAndAllow, deleteUser);
+router.delete("/current/delete", deleteUserCurrent); //un middleware avec le token ici
 
 module.exports = router;

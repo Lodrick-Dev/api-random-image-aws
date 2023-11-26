@@ -182,3 +182,25 @@ module.exports.deleteUser = async (req, res) => {
     return res.status(200).json({ message: error.message });
   }
 };
+
+//delete /delete mongo and Firebase TO USER CURRENT (connecting)
+module.exports.deleteUserCurrent = async (req, res) => {
+  const { email } = req.body;
+  if (!email)
+    return res.status(200).json({
+      message: `Erreur : Les champs sont nécessaires pour supprimer votre compte`,
+    });
+  try {
+    const userMongo = await UserModel.findOne({ email: email });
+    if (!userMongo)
+      return res.status(200).json({
+        message:
+          "Identification de l'utilisateur dans la base de donnée impossible",
+      });
+    await userMongo.deleteOne();
+    return res.status(200).json({ message: "ok" });
+  } catch (error) {
+    console.log("On est la op");
+    console.log(error);
+  }
+};
