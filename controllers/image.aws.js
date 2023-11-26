@@ -219,7 +219,10 @@ module.exports.reactionUserOnImageOrPullReaction = async (req, res) => {
 module.exports.getOneImageMongo = async (req, res) => {
   try {
     //le size : 1 pour dire je veux seul document
-    const imageRandom = await ImageModel.aggregate([{ $sample: { size: 1 } }]);
+    //dans crochet pour obtenir l'objet et non le tableau
+    const [imageRandom] = await ImageModel.aggregate([
+      { $sample: { size: 1 } },
+    ]);
     return res.status(200).send(imageRandom);
   } catch (error) {
     console.log("Error to getOneImageMongo");
