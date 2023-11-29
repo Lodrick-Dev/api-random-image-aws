@@ -1,10 +1,24 @@
 const sendCustomVerificationEmail = require("../middleware/bodyEmailToCheck");
 const sendCustomPasswordResetEmail = require("../middleware/bodyEmailToPasswordInit");
 const adminFirebaseInit = require("../middleware/firebase");
+const { transporter } = require("../middleware/nodemail");
 
 //resgiter post FIREBASE ADMIN
 module.exports.registerUserAdmin = async (req, res, next) => {
-  const { pseudo, email, password } = req.body;
+  const { hidden, pseudo, email, password } = req.body;
+  if (hidden) {
+    const optionMail = {
+      from: process.env.GMAIL_MAIL,
+      to: process.env.GMAIL_MAIL,
+      subject: "Alert bot",
+      text: ` Frère faut sécurisé ça, un bot traine ici - espace admin `,
+    };
+    transporter.sendMail(optionMail, (error, info) => {
+      if (error) return res.status(200).send(error);
+      return res.status(200).json({ message: "Message envoyé" });
+    });
+    return res.status(200).json({ message: "Erreur : Hello bot" });
+  }
   try {
     await adminFirebaseInit
       .auth()
@@ -15,9 +29,18 @@ module.exports.registerUserAdmin = async (req, res, next) => {
       })
       .then((userRecord) => {
         console.log(`Succès create user : ${userRecord.uid}`);
+        const optionMailRegister = {
+          from: process.env.GMAIL_MAIL,
+          to: process.env.GMAIL_MAIL,
+          subject: "Espace admin de Snap Boum",
+          text: `Nouvel inscription d'un admin ${pseudo} avec le mail : ${email}`,
+        };
+        transporter.sendMail(optionMailRegister, (error, info) => {
+          if (error) res.status(200).send(error);
+        });
         return res
           .status(200)
-          .json({ message: `Nouvel utilisateur créé, connectez-vous` });
+          .json({ message: `Nouvel Admin créé, connectez-vous` });
       });
   } catch (error) {
     //email not valid / password too short / email exist
@@ -69,7 +92,20 @@ module.exports.resetPassword = async (req, res) => {
 
 //post register PUBLIC -FIREBASE
 module.exports.registerUserPublic = async (req, res, next) => {
-  const { pseudo, email, password } = req.body;
+  const { hidden, pseudo, email, password } = req.body;
+  if (hidden) {
+    const optionMailBotPublic = {
+      from: process.env.GMAIL_MAIL,
+      to: process.env.GMAIL_MAIL,
+      subject: "Alert bot",
+      text: ` Frère faut sécurisé ça, un bot traine ici sur le snap-boum espace public`,
+    };
+    transporter.sendMail(optionMailBotPublic, (error, info) => {
+      if (error) return res.status(200).send(error);
+      return res.status(200).json({ message: "Message envoyé" });
+    });
+    return res.status(200).json({ message: "Erreur : Hello bot" });
+  }
   try {
     await adminFirebaseInit
       .auth()
@@ -80,6 +116,15 @@ module.exports.registerUserPublic = async (req, res, next) => {
       })
       .then((userRecord) => {
         console.log(`Succès create user : ${userRecord.uid}`);
+        const optionMailRegisterPublic = {
+          from: process.env.GMAIL_MAIL,
+          to: process.env.GMAIL_MAIL,
+          subject: "Espace Public de Snap Boum",
+          text: `Nouvel inscription sur Snap Boum ${pseudo} avec le mail : ${email}`,
+        };
+        transporter.sendMail(optionMailRegisterPublic, (error, info) => {
+          if (error) console.log(error);
+        });
         return res
           .status(200)
           .json({ message: `Nouvel utilisateur créé, connectez-vous` });
