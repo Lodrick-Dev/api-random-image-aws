@@ -238,18 +238,32 @@ module.exports.reactionUserOnImageSaveInMongo = async (req, res) => {
 
 //one random image from mongoDB
 module.exports.getOneImageMongo = async (req, res) => {
-  try {
-    //le size : 1 pour dire je veux seul document
-    //dans crochet pour obtenir l'objet et non le tableau
-    const [imageRandom] = await ImageModel.aggregate([
-      { $sample: { size: 1 } },
-    ]);
-    return res.status(200).send(imageRandom);
-  } catch (error) {
-    console.log("Error to getOneImageMongo");
-    console.log(error);
-    return res
-      .status(200)
-      .json({ message: "Erreur lors de la sélection de l'image" });
+  const id = req.params.id;
+  if (id) {
+    try {
+      const imageShare = await ImageModel.findById(id);
+      console.log("====================================");
+      console.log(imageShare);
+      console.log("====================================");
+      return res.status(200).send(imageShare);
+    } catch (error) {}
+  } else {
+    try {
+      //le size : 1 pour dire je veux seul document
+      //dans crochet pour obtenir l'objet et non le tableau
+      const [imageRandom] = await ImageModel.aggregate([
+        { $sample: { size: 1 } },
+      ]);
+      console.log("====================================");
+      console.log(imageRandom);
+      console.log("====================================");
+      return res.status(200).send(imageRandom);
+    } catch (error) {
+      console.log("Error to getOneImageMongo");
+      console.log(error);
+      return res
+        .status(200)
+        .json({ message: "Erreur lors de la sélection de l'image" });
+    }
   }
 };
