@@ -5,11 +5,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    trim: true,
   },
   email: {
     type: String,
     required: true,
     unique: true,
+    trim: true,
   },
   reactionsimages: {
     //chaque fois que l'utilisateur like,
