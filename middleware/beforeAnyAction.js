@@ -45,8 +45,8 @@ module.exports.checkTokenPublic = async (req, res, next) => {
     // donc si on const {user} = req on aura le user
     req.user = decodedToken;
     const user = req.user;
-    console.log("log ici bro");
-    console.log(user);
+    // console.log("log ici bro");
+    // console.log(user);
     //vérification si autorisé 👇
     next();
   } catch (error) {

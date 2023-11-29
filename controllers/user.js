@@ -7,7 +7,7 @@ module.exports.getUserId = async (req, res) => {
   if (!id) return res.status(200).json({ message: "Erreur : Id inconnu" });
   try {
     const userRecord = await adminFirebaseInit.auth().getUser(id);
-    console.log(userRecord.email);
+    // console.log(userRecord.email);
     if (!userRecord)
       return res
         .status(200)
@@ -20,9 +20,9 @@ module.exports.getUserId = async (req, res) => {
 
     return res.status(200).send(userMongo);
   } catch (error) {
-    console.log("====================================");
+    console.log("================error====================");
     console.log(error);
-    console.log("====================================");
+    console.log("==================error==================");
     return res.status(200).json({ message: error.message });
   }
 };
@@ -94,8 +94,8 @@ module.exports.getUserByEmailSend = async (req, res) => {
     const userRecord = await adminFirebaseInit.auth().getUserByEmail(email);
     return res.status(200).send(userRecord);
   } catch (error) {
-    console.log("====================================");
-    console.log();
+    console.log("====error get user by email================================");
+    console.log(error);
     console.log("====================================");
     return res.status(200).json({ message: error.message });
   }

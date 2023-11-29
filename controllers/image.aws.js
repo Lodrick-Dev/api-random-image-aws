@@ -85,8 +85,9 @@ module.exports.getOneRandom = async (req, res) => {
 };
 
 //put reaction - token nameimage emailuser react
-module.exports.reactionUserOnImage = async (req, res) => {
+module.exports.reactionUserOnImageSaveInMongo = async (req, res) => {
   const { idimgmongo, emailuser, react } = req.body;
+  console.log(react);
 
   try {
     // Trouver l'image par ID
@@ -111,15 +112,20 @@ module.exports.reactionUserOnImage = async (req, res) => {
         if (react === "unlike") {
           // Si la réaction est "unlike", supprimer l'objet pour cet utilisateur
           updateQuery = { $pull: { reactionsusers: { emailuser } } };
+          console.log("On retire");
         } else {
           // Si la réaction n'est pas "unlike", mettre à jour la réaction
           updateQuery = { $set: { "reactionsusers.$.reaction": react } };
+          console.log("On ajoute");
         }
         await ImageModel.updateOne(
           { _id: image._id, "reactionsusers.emailuser": emailuser },
           updateQuery
           // { $set: { "reactionsusers.$.reaction": react } }
         );
+
+        // Émettre un événement WebSocket pour informer les clients
+        const imageUp = await ImageModel.findById(idimgmongo);
         return res.status(200).json({ message: "ok" });
       } catch (error) {
         console.log(
@@ -137,6 +143,7 @@ module.exports.reactionUserOnImage = async (req, res) => {
           { _id: image._id },
           { $push: { reactionsusers: { emailuser, reaction: react } } }
         );
+        console.log("On ajoute");
         return res.status(200).json({ message: "ok" });
       } catch (error) {
         console.log("Erreur si l'utilisateur n'a pas encore réagi : " + error);
@@ -157,77 +164,77 @@ module.exports.reactionUserOnImage = async (req, res) => {
   }
 };
 
-//mem code mais vérifie si l'utilisateur retire sa reaction
-module.exports.reactionUserOnImageOrPullReaction = async (req, res) => {
-  const { id, emailuser, react } = req.body;
+//mem code mais vérifie si l'utilisateur retire sa reaction not use
+// module.exports.reactionUserOnImageOrPullReaction = async (req, res) => {
+//   const { id, emailuser, react } = req.body;
 
-  try {
-    // Trouver l'image par ID
-    const image = await ImageModel.findById(id);
+//   try {
+//     // Trouver l'image par ID
+//     const image = await ImageModel.findById(id);
 
-    // Vérifier si l'image existe
-    if (!image) {
-      return res
-        .status(200)
-        .json({ message: "Erreur : Identification de l'image impossible" });
-    }
+//     // Vérifier si l'image existe
+//     if (!image) {
+//       return res
+//         .status(200)
+//         .json({ message: "Erreur : Identification de l'image impossible" });
+//     }
 
-    // Vérifier si l'utilisateur a déjà réagi
-    const userAlreadyReacted = image.reactionsusers.some(
-      (reaction) => reaction.emailuser === emailuser
-    );
+//     // Vérifier si l'utilisateur a déjà réagi
+//     const userAlreadyReacted = image.reactionsusers.some(
+//       (reaction) => reaction.emailuser === emailuser
+//     );
 
-    if (userAlreadyReacted) {
-      // L'utilisateur a déjà réagi, mise à jour de sa réaction
-      try {
-        // Vérifier si react est null avant de mettre à jour
-        if (react !== null) {
-          await ImageModel.updateOne(
-            { _id: image._id, "reactionsusers.emailuser": emailuser },
-            { $set: { "reactionsusers.$.reaction": react } }
-          );
-        } else {
-          // Si react est null, retirer l'objet contenant l'e-mail de l'utilisateur
-          await ImageModel.updateOne(
-            { _id: image._id },
-            { $pull: { reactionsusers: { emailuser } } }
-          );
-        }
-      } catch (error) {
-        console.log(
-          "Erreur lors de la mise à jour de la réaction de l'utilisateur : " +
-            error
-        );
-      }
-    } else {
-      // L'utilisateur n'a pas encore réagi, ajouter sa réaction si react n'est pas null
-      if (react !== null) {
-        try {
-          await ImageModel.updateOne(
-            { _id: image._id },
-            { $push: { reactionsusers: { emailuser, reaction: react } } }
-          );
-        } catch (error) {
-          console.log(
-            "Erreur si l'utilisateur n'a pas encore réagi : " + error
-          );
-        }
-      }
-    }
+//     if (userAlreadyReacted) {
+//       // L'utilisateur a déjà réagi, mise à jour de sa réaction
+//       try {
+//         // Vérifier si react est null avant de mettre à jour
+//         if (react !== null) {
+//           await ImageModel.updateOne(
+//             { _id: image._id, "reactionsusers.emailuser": emailuser },
+//             { $set: { "reactionsusers.$.reaction": react } }
+//           );
+//         } else {
+//           // Si react est null, retirer l'objet contenant l'e-mail de l'utilisateur
+//           await ImageModel.updateOne(
+//             { _id: image._id },
+//             { $pull: { reactionsusers: { emailuser } } }
+//           );
+//         }
+//       } catch (error) {
+//         console.log(
+//           "Erreur lors de la mise à jour de la réaction de l'utilisateur : " +
+//             error
+//         );
+//       }
+//     } else {
+//       // L'utilisateur n'a pas encore réagi, ajouter sa réaction si react n'est pas null
+//       if (react !== null) {
+//         try {
+//           await ImageModel.updateOne(
+//             { _id: image._id },
+//             { $push: { reactionsusers: { emailuser, reaction: react } } }
+//           );
+//         } catch (error) {
+//           console.log(
+//             "Erreur si l'utilisateur n'a pas encore réagi : " + error
+//           );
+//         }
+//       }
+//     }
 
-    return res
-      .status(200)
-      .json({ message: "Réaction de l'utilisateur mise à jour avec succès" });
-  } catch (error) {
-    console.log(
-      "Erreur lors de la gestion de la réaction de l'utilisateur : " + error
-    );
-    return res.status(500).json({
-      message:
-        "Erreur serveur lors de la gestion de la réaction de l'utilisateur",
-    });
-  }
-};
+//     return res
+//       .status(200)
+//       .json({ message: "Réaction de l'utilisateur mise à jour avec succès" });
+//   } catch (error) {
+//     console.log(
+//       "Erreur lors de la gestion de la réaction de l'utilisateur : " + error
+//     );
+//     return res.status(500).json({
+//       message:
+//         "Erreur serveur lors de la gestion de la réaction de l'utilisateur",
+//     });
+//   }
+// };
 
 //one random image from mongoDB
 module.exports.getOneImageMongo = async (req, res) => {

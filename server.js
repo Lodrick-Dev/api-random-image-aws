@@ -1,7 +1,11 @@
 const express = require("express");
+// const http = require("http");
 const connectDB = require("./config/db");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
+// const { Server } = require("socket.io");
+// const { initWebSocketServer } = require("./utils/websocket");
+const { createServeurWebsocket } = require("./utils/createServeurSocket");
 // const adminFirebaseInit = require("./middleware/firebase");
 
 //mettre ici pour que mongo se connect
@@ -13,8 +17,12 @@ connectDB();
 //app / express
 const app = express();
 
+//WESOCKEt
+// Créer le serveur HTTP à partir de l'application Express
+
+const allowedOrigins = ["http://localhost:3000/"];
+
 //cors policy
-const allowedOrigins = ["http://localhost:3000"];
 const corsOption = {
   origin: "http://localhost:3000",
   credentials: true,
@@ -32,14 +40,28 @@ const corsOption = {
   // },
 };
 app.use(cors(corsOption));
+// Attacher Socket.IO au serveur HTTP
+const { serverSocket } = createServeurWebsocket(app);
+// const server = http.createServer(app);
+// const io = new Server(server, {
+//   cors: {
+//     origin: "http://localhost:3000",
+//     methods: ["GET", "POST"],
+//   },
+// });
+
+//initialisation du serveur websocket
+// const initializedIo = initWebSocketServer(io);
+
+// io.on("connection", (socket) => {
+//   // console.log(socket);
+//   console.log(`Nouvelle connection avec l'id ${socket.id}`);
+// });
 
 //permet de trater les deonner de la req avant les routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-//vérification direct après connexion avec le server
-// app.get("/check")
 
 app.get("/", (req, res, next) => {
   return res.status(200).json({ message: "Ok bro" });
@@ -52,6 +74,7 @@ app.use("/aws", require("./routes/image.routes"));
 //route contact
 
 const port = process.env.PORT || 5000;
-app.listen(port, () => {
+serverSocket.app;
+serverSocket.listen(port, () => {
   console.log(`Listening on port ${port}`);
 });

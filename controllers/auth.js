@@ -40,10 +40,10 @@ module.exports.checkEmailIsValide = async (req, res) => {
         return sendCustomVerificationEmail(email, displayName, link, res);
       });
   } catch (error) {
-    console.log("====================================");
+    console.log("===============error=====================");
     console.log(error);
     res.status(200).json({ message: "Erreur bro : " + error.message });
-    console.log("====================================");
+    console.log("===================error=================");
   }
 };
 

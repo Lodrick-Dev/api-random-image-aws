@@ -5,13 +5,14 @@ const {
   deleteImg,
   getOneRandom,
   getAll,
-  reactionUserOnImage,
   getOneImageMongo,
+  reactionUserOnImageSaveInMongo,
 } = require("../controllers/image.aws");
 const {
   checkTokenAndAllow,
   checkTokenPublic,
 } = require("../middleware/beforeAnyAction");
+const { sendNewreaction } = require("../utils/initWebSocketServer");
 
 const fileFilterImg = (req, file, cb) => {
   if (
@@ -52,6 +53,6 @@ router.get("/random/image", getOneRandom);
 //call on piece random - to PUBLIC from MONGO
 router.get("/random/one/image", getOneImageMongo);
 //action like REACTION - PUBLIC -- check if connecté (middleware)
-router.put("/react/image", checkTokenPublic, reactionUserOnImage);
+router.put("/react/image", checkTokenPublic, reactionUserOnImageSaveInMongo);
 
 module.exports = router;
