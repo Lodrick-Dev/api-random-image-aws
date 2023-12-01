@@ -24,12 +24,12 @@ const sendNewReaction = (io, socket) => {
   //correspond a celui affiché au moment même de la reaction
   //socket.on écoute la l'évenement : new_reaction en front
   socket.on("catch_new_reaction", async (data) => {
-    console.log("Voici l'id ", data.id);
+    // console.log("Voici l'id ", data.id);
     const id = data.id;
     const imageReaction = await ImageModel.findById(id);
-    console.log("==============socket ======================");
+    // console.log("==============socket ======================");
     // console.log(imageReaction);
-    console.log("====================================");
+    // console.log("====================================");
     if (imageReaction) {
       io.emit("send_new_reaction", imageReaction);
     }
