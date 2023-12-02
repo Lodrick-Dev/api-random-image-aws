@@ -238,9 +238,9 @@ module.exports.getOneImageMongo = async (req, res) => {
   if (id) {
     try {
       const imageShare = await ImageModel.findById(id);
-      console.log("====================================");
-      console.log(imageShare);
-      console.log("====================================");
+      // console.log("====================================");
+      // console.log(imageShare);
+      // console.log("====================================");
       return res.status(200).send(imageShare);
     } catch (error) {}
   } else {
@@ -250,9 +250,9 @@ module.exports.getOneImageMongo = async (req, res) => {
       const [imageRandom] = await ImageModel.aggregate([
         { $sample: { size: 1 } },
       ]);
-      console.log("====================================");
-      console.log(imageRandom);
-      console.log("====================================");
+      // console.log("====================================");
+      // console.log(imageRandom);
+      // console.log("====================================");
       return res.status(200).send(imageRandom);
     } catch (error) {
       console.log("Error to getOneImageMongo");
