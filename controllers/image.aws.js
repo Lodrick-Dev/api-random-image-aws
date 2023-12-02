@@ -85,7 +85,7 @@ module.exports.getOneRandom = async (req, res) => {
 };
 
 //put reaction - token nameimage emailuser react
-module.exports.reactionUserOnImageSaveInMongo = async (req, res) => {
+module.exports.reactionUserOnImageSaveInMongo = async (req, res, next) => {
   const { idimgmongo, emailuser, react } = req.body;
   console.log(react);
 
@@ -124,8 +124,7 @@ module.exports.reactionUserOnImageSaveInMongo = async (req, res) => {
           // { $set: { "reactionsusers.$.reaction": react } }
         );
 
-        // Émettre un événement WebSocket pour informer les clients
-        const imageUp = await ImageModel.findById(idimgmongo);
+        next();
         return res.status(200).json({ message: "ok" });
       } catch (error) {
         console.log(
@@ -144,15 +143,12 @@ module.exports.reactionUserOnImageSaveInMongo = async (req, res) => {
           { $push: { reactionsusers: { emailuser, reaction: react } } }
         );
         console.log("On ajoute");
+        next();
         return res.status(200).json({ message: "ok" });
       } catch (error) {
         console.log("Erreur si l'utilisateur n'a pas encore réagi : " + error);
       }
     }
-
-    return res
-      .status(200)
-      .json({ message: "Réaction de l'utilisateur mise à jour avec succès" });
   } catch (error) {
     console.log(
       "Erreur lors de la gestion de la réaction de l'utilisateur : " + error
