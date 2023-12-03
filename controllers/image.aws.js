@@ -36,17 +36,18 @@ module.exports.uploadImg = async (req, res) => {
 
 //delete image
 module.exports.deleteImg = async (req, res) => {
-  const { name } = req.body;
-  if (!name) return res.status(200).json({ message: `Le nom est introuvable` });
+  const { namemongo, nameaws } = req.body;
+  if (!namemongo || !nameaws)
+    return res.status(200).json({ message: `Le nom est introuvable` });
   try {
-    const image = await ImageModel.findOne({ nameimage: name });
+    const image = await ImageModel.findOne({ nameimage: namemongo });
     if (!image)
       return res
         .status(200)
         .json({ message: "Erreur : Objet non trouvé dans la base de donnée" });
     const deleteInAwsAndDataBase = async () => {
       try {
-        await deleteImgAws(name);
+        await deleteImgAws(nameaws);
         await image.deleteOne();
         return res.status(200).json({ message: "Image supprimée avec succès" });
       } catch (error) {
