@@ -20,9 +20,8 @@ const imageSchema = new mongoose.Schema({
   commentairessusers: {
     type: [
       {
-        emailuser: {
+        pseudo: {
           type: String,
-          unique: true,
         },
         commentaire: String,
       },
