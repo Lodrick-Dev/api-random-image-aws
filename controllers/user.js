@@ -35,6 +35,11 @@ module.exports.updateUser = async (req, res) => {
     return res.status(200).json({
       message: "Erreur : L'identification de l'utilisateur n'a pas réussie",
     });
+
+  if (pseudo.length < 3)
+    return res
+      .status(200)
+      .json({ message: "Erreur : Pseudo trop court, min 3 caractères" });
   try {
     const userCurrent = await adminFirebaseInit.auth().getUser(id);
     if (!userCurrent)
