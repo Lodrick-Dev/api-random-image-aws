@@ -89,7 +89,7 @@ module.exports.getOneRandom = async (req, res) => {
 //put reaction - token nameimage emailuser react
 module.exports.reactionUserOnImageSaveInMongo = async (req, res, next) => {
   const { idimgmongo, emailuser, react } = req.body;
-  console.log(react);
+  // console.log(react);
 
   try {
     // Trouver l'image par ID
@@ -118,7 +118,7 @@ module.exports.reactionUserOnImageSaveInMongo = async (req, res, next) => {
         } else {
           // Si la réaction n'est pas "unlike", mettre à jour la réaction
           updateQuery = { $set: { "reactionsusers.$.reaction": react } };
-          console.log("On ajoute");
+          // console.log("On ajoute");
         }
         await ImageModel.updateOne(
           { _id: image._id, "reactionsusers.emailuser": emailuser },
@@ -144,7 +144,7 @@ module.exports.reactionUserOnImageSaveInMongo = async (req, res, next) => {
           { _id: image._id },
           { $push: { reactionsusers: { emailuser, reaction: react } } }
         );
-        console.log("On ajoute");
+        // console.log("On ajoute");
         next();
         return res.status(200).json({ message: "ok" });
       } catch (error) {
@@ -165,7 +165,6 @@ module.exports.reactionUserOnImageSaveInMongo = async (req, res, next) => {
 //put comment - token COMMENTAIRES
 module.exports.commentImage = async (req, res, next) => {
   const { comment, idimgmongo, emailuser } = req.body;
-  console.log(idimgmongo);
   if (!comment)
     return res.status(200).json({ message: "Erreur: Espace vide " });
   if (!idimgmongo)
@@ -174,10 +173,6 @@ module.exports.commentImage = async (req, res, next) => {
       .json({ message: "Erreur: Identification de l'image non réussie" });
   if (!emailuser)
     return res.status(200).json({ message: "Utilisateur non identifié" });
-
-  console.log(
-    `Voici le commentaire : ${comment} sur l'image : ${idimgmongo} avec l'utilisateur : ${emailuser}`
-  );
 
   try {
     const image = await ImageModel.findById(idimgmongo);
