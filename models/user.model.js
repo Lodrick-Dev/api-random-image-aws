@@ -24,6 +24,23 @@ const userSchema = new mongoose.Schema({
     ], //un bojet dans le array
     default: [],
   },
+  biographie: {
+    type: String,
+    default: "",
+  },
+  link: {
+    type: String,
+    default: "",
+  },
+  messages: {
+    type: [
+      {
+        email: String,
+        message: [],
+      },
+    ],
+    default: [],
+  },
 });
 
 //user est le nom de la table dans la dataBase

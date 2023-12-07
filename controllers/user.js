@@ -30,64 +30,131 @@ module.exports.getUserId = async (req, res) => {
 //put /update/:id check in firebase then in mongoDb
 module.exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { pseudo } = req.body;
-  if (!id || !pseudo)
+  const { pseudo, biographie, link } = req.body;
+  let userCurrent;
+  if (id) {
+    try {
+      userCurrent = await adminFirebaseInit.auth().getUser(id);
+      if (!userCurrent)
+        return res
+          .status(200)
+          .json({ message: "Erreur : Utilisateur non trouvé" });
+    } catch (error) {
+      console.log(error);
+      return res.status(200).json({ message: "Une erreur est survenue" });
+    }
+  } else {
     return res.status(200).json({
       message: "Erreur : L'identification de l'utilisateur n'a pas réussie",
     });
+  }
 
-  if (pseudo.length < 3)
-    return res
-      .status(200)
-      .json({ message: "Erreur : Pseudo trop court, min 3 caractères" });
-  try {
-    const userCurrent = await adminFirebaseInit.auth().getUser(id);
-    if (!userCurrent)
+  //id trouvé on continue
+  if (pseudo) {
+    if (pseudo.length < 3)
       return res
         .status(200)
-        .json({ message: "Erreur : Utilisateur non trouvé" });
-
-    //on vérifie si le nom exist normal :
-    const checkIfPseudoExist = await UserModel.findOne({ pseudo: pseudo });
-    if (checkIfPseudoExist) {
+        .json({ message: "Erreur : Pseudo trop court, min 3 caractères" });
+    if (pseudo.length > 15)
       return res
         .status(200)
-        .json({ message: `Erreur : le pseudo " ${pseudo} " existe déjà` });
+        .json({ message: "Erreur : Pseudo trop long,max 15 caractères" });
+    try {
+      // const userCurrent = await adminFirebaseInit.auth().getUser(id);
+      // if (!userCurrent)
+      //   return res
+      //     .status(200)
+      //     .json({ message: "Erreur : Utilisateur non trouvé" });
+
+      //on vérifie si le nom exist normal :
+      const checkIfPseudoExist = await UserModel.findOne({ pseudo: pseudo });
+      if (checkIfPseudoExist) {
+        return res
+          .status(200)
+          .json({ message: `Erreur : le pseudo " ${pseudo} " existe déjà` });
+      }
+      //on vréifie avec la première lettre
+      const lettreFirstCapital =
+        pseudo.charAt(0).toUpperCase() + pseudo.slice(1);
+      // console.log(lettreFirstCapital);
+      const checkIfExisteFirstLettreCapital = await UserModel.findOne({
+        pseudo: lettreFirstCapital,
+      });
+      if (checkIfExisteFirstLettreCapital)
+        return res
+          .status(200)
+          .json({ message: `Erreur : ${pseudo} existe déjà 🤔` });
+
+      //on vérifie avec minuscule
+      const checkIfPseudoExistMin = await UserModel.findOne({
+        pseudo: pseudo.toLowerCase(),
+      });
+      if (checkIfPseudoExistMin)
+        return res
+          .status(200)
+          .json({ message: `Erreur : ${pseudo} existe déjà` });
+      //on update
+      const userMongoUpdate = await UserModel.updateOne(
+        { email: userCurrent.email },
+        { $set: { pseudo: pseudo } }
+      );
+      if (!userMongoUpdate)
+        return res
+          .status(200)
+          .json({ message: "Erreur : Echec lors de la mise à jour du pseudo" });
+      return res.status(200).send(userMongoUpdate);
+    } catch (error) {
+      console.log("==============IN erreor======================");
+      console.log(error);
+      console.log("====================================");
+      return res.status(200).json({ message: error.message });
     }
-    //on vréifie avec la première lettre
-    const lettreFirstCapital = pseudo.charAt(0).toUpperCase() + pseudo.slice(1);
-    // console.log(lettreFirstCapital);
-    const checkIfExisteFirstLettreCapital = await UserModel.findOne({
-      pseudo: lettreFirstCapital,
-    });
-    if (checkIfExisteFirstLettreCapital)
-      return res
-        .status(200)
-        .json({ message: `Erreur : ${pseudo} existe déjà 🤔` });
+  }
 
-    //on vérifie avec minuscule
-    const checkIfPseudoExistMin = await UserModel.findOne({
-      pseudo: pseudo.toLowerCase(),
-    });
-    if (checkIfPseudoExistMin)
-      return res
-        .status(200)
-        .json({ message: `Erreur : ${pseudo} existe déjà` });
-    //on update
-    const userMongoUpdate = await UserModel.updateOne(
-      { email: userCurrent.email },
-      { $set: { pseudo: pseudo } }
-    );
-    if (!userMongoUpdate)
-      return res
-        .status(200)
-        .json({ message: "Erreur : Echec lors de la mise à jour du pseudo" });
-    return res.status(200).send(userMongoUpdate);
-  } catch (error) {
-    console.log("==============IN erreor======================");
-    console.log(error);
-    console.log("====================================");
-    return res.status(200).json({ message: error.message });
+  //la bio
+  if (biographie) {
+    try {
+      const userMongoUpdate = await UserModel.updateOne(
+        { email: userCurrent.email },
+        { $set: { biographie: biographie } }
+      );
+      if (!userMongoUpdate)
+        return res.status(200).json({
+          message: "Erreur : Echec lors de la mise à jour de la biographie",
+        });
+      return res.status(200).send(userMongoUpdate);
+    } catch (error) {
+      console.log(error);
+      return res.status(200).json({
+        message: "Erreur : un erreur inattendue est survenue dans le serveur",
+      });
+    }
+  }
+
+  //le lien
+  if (link) {
+    const regexLien = /^(http(s)?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ;,./?%&=]*)?$/;
+    if (regexLien.test(link)) {
+      //lien correct continue
+      try {
+        const userMongoUpdate = await UserModel.updateOne(
+          { email: userCurrent.email },
+          { $set: { link: link } }
+        );
+        if (!userMongoUpdate)
+          return res.status(200).json({
+            message: "Erreur : Echec lors de la mise à jour de la biographie",
+          });
+        return res.status(200).send(userMongoUpdate);
+      } catch (error) {
+        console.log(error);
+        return res.status(200).json({
+          message: "Erreur : un erreur inattendue est survenue dans le serveur",
+        });
+      }
+    } else {
+      return res.status(200).json({ message: "Erreur : Lien incorrect" });
+    }
   }
 };
 
