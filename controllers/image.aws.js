@@ -1,4 +1,5 @@
 const ImageModel = require("../models/image.model");
+const UserModel = require("../models/user.model");
 const {
   deleteImgAws,
   uploadImgAws,
@@ -161,8 +162,63 @@ module.exports.reactionUserOnImageSaveInMongo = async (req, res, next) => {
   }
 };
 
-//put comment - token
-module.exports.commentImage = async (req, res, next) => {};
+//put comment - token COMMENTAIRES
+module.exports.commentImage = async (req, res, next) => {
+  const { comment, idimgmongo, emailuser } = req.body;
+  console.log(idimgmongo);
+  if (!comment)
+    return res.status(200).json({ message: "Erreur: Espace vide " });
+  if (!idimgmongo)
+    return res
+      .status(200)
+      .json({ message: "Erreur: Identification de l'image non réussie" });
+  if (!emailuser)
+    return res.status(200).json({ message: "Utilisateur non identifié" });
+
+  console.log(
+    `Voici le commentaire : ${comment} sur l'image : ${idimgmongo} avec l'utilisateur : ${emailuser}`
+  );
+
+  try {
+    const image = await ImageModel.findById(idimgmongo);
+    if (!image)
+      return res.status(200).json({ message: "Erreur : image non trouvée" });
+
+    const user = await UserModel.findOne({ email: emailuser });
+    if (!user)
+      return res.status(200).json({
+        message: "Erreur : utilisateur non identifié dans la base de donnée",
+      });
+
+    //image existe, on contiue
+
+    try {
+      await ImageModel.updateOne(
+        { _id: image._id },
+        {
+          $push: {
+            commentaires: { pseudo: user.pseudo, texte: comment },
+          },
+        }
+      );
+      next();
+      return res.status(200).json({ message: "ok" });
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(200)
+        .json({ message: "Une erreur est survenue lors de la mise à jour" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(200)
+      .json({ message: "Une erreur est survenue depuis le serveur" });
+  }
+  // res.status(200).json({
+  //   message: `Voici le commentaire : ${comment} sur l'image : ${idimgmongo} avec l'utilisateur : ${emailuser}`,
+  // });
+};
 
 //one random image from mongoDB
 module.exports.getOneImageMongo = async (req, res) => {

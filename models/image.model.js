@@ -17,18 +17,22 @@ const imageSchema = new mongoose.Schema({
     required: false,
     default: [],
   },
-  commentairessusers: {
-    type: [
-      {
-        pseudo: {
-          type: String,
-        },
-        commentaire: String,
+  commentaires: [
+    {
+      pseudo: {
+        type: String,
+        required: true,
       },
-    ],
-    required: false,
-    default: [],
-  },
+      texte: {
+        type: String,
+        required: true,
+      },
+      date: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
 });
 
 const ImageModel = mongoose.model("image", imageSchema);
