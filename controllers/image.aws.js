@@ -192,7 +192,11 @@ module.exports.commentImage = async (req, res, next) => {
         { _id: image._id },
         {
           $push: {
-            commentaires: { pseudo: user.pseudo, texte: comment },
+            commentaires: {
+              pseudo: user.pseudo,
+              texte: comment,
+              iduser: user._id,
+            },
           },
         }
       );
@@ -225,7 +229,12 @@ module.exports.getOneImageMongo = async (req, res) => {
       // console.log(imageShare);
       // console.log("====================================");
       return res.status(200).send(imageShare);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      return res
+        .status(200)
+        .json({ message: "Erreur : Lors de la récupération de l'image" });
+    }
   } else {
     try {
       //le size : 1 pour dire je veux seul document
@@ -233,10 +242,36 @@ module.exports.getOneImageMongo = async (req, res) => {
       const [imageRandom] = await ImageModel.aggregate([
         { $sample: { size: 1 } },
       ]);
-      // console.log("====================================");
-      // console.log(imageRandom);
-      // console.log("====================================");
-      return res.status(200).send(imageRandom);
+      const imgToReactions = await ImageModel.findById(imageRandom._id);
+      const reactions = imgToReactions.reactionsusers;
+      let haha = [];
+      let like = [];
+      let grrr = [];
+      for (let i = 0; i < reactions.length; i++) {
+        // console.log(reactions[i]);
+        if (reactions[i].reaction === "haha") {
+          haha.push(reactions[i].reaction);
+        }
+        if (reactions[i].reaction === "like") {
+          like.push(reactions[i].reaction);
+        }
+        if (reactions[i].reaction === "grrr") {
+          grrr.push(reactions[i].reaction);
+        }
+      }
+
+      //objet qui contient les objets des reactions
+      const imagereactions = {
+        haha: haha,
+        like: like,
+        grrr: grrr,
+      };
+      //on fusion l'objet de l'image récupéré avec l'objet des reactions
+      const imgDisplay = {
+        ...imageRandom,
+        reactions: imagereactions,
+      };
+      return res.status(200).send(imgDisplay);
     } catch (error) {
       console.log("Error to getOneImageMongo");
       console.log(error);

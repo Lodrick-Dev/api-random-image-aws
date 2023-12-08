@@ -27,6 +27,10 @@ const imageSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
+      iduser: {
+        type: String,
+        required: true,
+      },
       date: {
         type: Date,
         default: Date.now,
