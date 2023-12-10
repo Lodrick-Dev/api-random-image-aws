@@ -34,4 +34,9 @@ const sendNewReaction = (io, socket) => {
       io.emit("send_new_reaction", imageReaction);
     }
   });
+
+  socket.on("catch_new_commentaire", async (data) => {
+    const imageCommentaire = await ImageModel.findById(data.id);
+    io.emit("send_new_commentaire", imageCommentaire);
+  });
 };
