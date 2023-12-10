@@ -139,6 +139,10 @@ module.exports.reactionUserOnImageSaveInMongo = async (req, res, next) => {
       }
     } else {
       // L'utilisateur n'a pas encore réagi, ajouter sa réaction
+      if (react === "unlike") {
+        next();
+        return res.status(200).json({ message: "no" });
+      }
       try {
         await ImageModel.updateOne(
           { _id: image._id },
@@ -228,7 +232,35 @@ module.exports.getOneImageMongo = async (req, res) => {
       // console.log("====================================");
       // console.log(imageShare);
       // console.log("====================================");
-      return res.status(200).send(imageShare);
+      const reactions = imageShare.reactionsusers;
+      let haha = [];
+      let like = [];
+      let grrr = [];
+      for (let i = 0; i < reactions.length; i++) {
+        // console.log(reactions[i]);
+        if (reactions[i].reaction === "haha") {
+          haha.push(reactions[i].reaction);
+        }
+        if (reactions[i].reaction === "like") {
+          like.push(reactions[i].reaction);
+        }
+        if (reactions[i].reaction === "grrr") {
+          grrr.push(reactions[i].reaction);
+        }
+      }
+
+      //objet qui contient les objets des reactions
+      const imagereactions = {
+        haha: haha,
+        like: like,
+        grrr: grrr,
+      };
+      //on fusion l'objet de l'image récupéré avec l'objet des reactions
+      const imgDisplayShare = {
+        ...imageShare,
+        reactions: imagereactions,
+      };
+      return res.status(200).send(imgDisplayShare);
     } catch (error) {
       console.log(error);
       return res
