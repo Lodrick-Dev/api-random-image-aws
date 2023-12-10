@@ -33,7 +33,8 @@ module.exports.checkTokenAndAllow = async (req, res, next) => {
 
 //PUBLIC
 module.exports.checkTokenPublic = async (req, res, next) => {
-  const token = req.body.token || req.params.token || req.query.token;
+  const token = req.body.token || req.query.token;
+  // console.log(token);
   if (!token)
     return res
       .status(200)

@@ -27,6 +27,31 @@ module.exports.getUserId = async (req, res) => {
   }
 };
 
+//get /user findUser in mongo
+module.exports.findUserMongo = async (req, res) => {
+  const { id } = req.params;
+  if (!id)
+    return res
+      .status(200)
+      .json({ message: "Erreur: donnée manquante pour la recherche" });
+
+  try {
+    const userFind = await UserModel.findById(id).select(
+      "-messages -email -reactionsimages"
+    );
+    if (!userFind)
+      return res
+        .status(200)
+        .json({ message: "Erreur : Utilisateur non trouvé" });
+    return res.status(200).send(userFind);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(200)
+      .json({ message: "Erreur : lors de la tentative de recherche" });
+  }
+};
+
 //put /update/:id check in firebase then in mongoDb
 module.exports.updateUser = async (req, res) => {
   const { id } = req.params;
@@ -112,6 +137,26 @@ module.exports.updateUser = async (req, res) => {
   }
 
   //la bio
+  //pour mettre aucune bio
+  if (biographie === "0") {
+    try {
+      const userMongoEmptyBio = await UserModel.updateOne(
+        {
+          email: userCurrent.email,
+        },
+        { $set: { biographie: "" } }
+      );
+      if (!userMongoEmptyBio)
+        return res
+          .status(200)
+          .json({ message: "Erreur , lors de la mise à jour sans biographie" });
+      return res.status(200).send(userMongoEmptyBio);
+    } catch (error) {
+      console.log(error);
+      return res.status(200).json({ message: "Erreur, inattendue" });
+    }
+  }
+  //pour mettre une bio
   if (biographie) {
     try {
       const userMongoUpdate = await UserModel.updateOne(
@@ -131,6 +176,25 @@ module.exports.updateUser = async (req, res) => {
     }
   }
 
+  //pour enlever le lien
+  if (link === "0") {
+    try {
+      const userMongoEmptyLink = await UserModel.updateOne(
+        {
+          email: userCurrent.email,
+        },
+        { $set: { link: "" } }
+      );
+      if (!userMongoEmptyLink)
+        return res
+          .status(200)
+          .json({ message: "Erreur , lors de la mise à jour sans biographie" });
+      return res.status(200).send(userMongoEmptyLink);
+    } catch (error) {
+      console.log(error);
+      return res.status(200).json({ message: "Erreur, inattendue" });
+    }
+  }
   //le lien
   if (link) {
     const regexLien = /^(http(s)?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- ;,./?%&=]*)?$/;

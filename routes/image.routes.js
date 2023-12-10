@@ -8,6 +8,7 @@ const {
   getOneImageMongo,
   reactionUserOnImageSaveInMongo,
   commentImage,
+  deleteMyCommentaire,
 } = require("../controllers/image.aws");
 const {
   checkTokenAndAllow,
@@ -55,6 +56,7 @@ router.get("/random/image", getOneRandom);
 router.get("/random/one/image/:id?", getOneImageMongo);
 //action like REACTION - PUBLIC -- check if connecté (middleware)
 router.put("/react/image", checkTokenPublic, reactionUserOnImageSaveInMongo);
+router.delete("/comment/delete", checkTokenPublic, deleteMyCommentaire);
 router.put("/comment/image", checkTokenPublic, commentImage);
 
 module.exports = router;

@@ -166,7 +166,7 @@ module.exports.reactionUserOnImageSaveInMongo = async (req, res, next) => {
   }
 };
 
-//put comment - token COMMENTAIRES
+//put comment - middleware token before this methode COMMENTAIRES
 module.exports.commentImage = async (req, res, next) => {
   const { comment, idimgmongo, emailuser } = req.body;
   if (!comment)
@@ -221,6 +221,39 @@ module.exports.commentImage = async (req, res, next) => {
   // res.status(200).json({
   //   message: `Voici le commentaire : ${comment} sur l'image : ${idimgmongo} avec l'utilisateur : ${emailuser}`,
   // });
+};
+
+//delete comment - middleware token before this methode COMMENTAIRES
+module.exports.deleteMyCommentaire = async (req, res, next) => {
+  const { idimgmongo, idcomment, iduser } = req.body;
+
+  if (!idimgmongo || !idcomment || !iduser)
+    return res
+      .status(200)
+      .json({ message: "Erreur : une donnée reste introuvable" });
+
+  try {
+    //new : true renvoie le document mis a jour
+    const updateImage = await ImageModel.findOneAndUpdate(
+      {
+        _id: idimgmongo,
+        "commentaires._id": idcomment,
+        "commentaires.iduser": iduser,
+      },
+      {
+        $pull: { commentaires: { _id: idcomment } },
+      },
+      { new: true }
+    );
+    if (!updateImage)
+      return res
+        .status(200)
+        .json({ message: "Erreur, lors de la suppréssion du commentaire" });
+    next();
+    return res.status(200).json({ message: "ok" });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 //one random image from mongoDB
