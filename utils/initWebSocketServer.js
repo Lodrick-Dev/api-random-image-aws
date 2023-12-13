@@ -27,12 +27,37 @@ const sendNewReaction = (io, socket) => {
     // console.log("Voici l'id ", data.id);
     const id = data.id;
     const imageReaction = await ImageModel.findById(id);
-    // console.log("==============socket ======================");
-    // console.log(imageReaction);
-    // console.log("====================================");
-    if (imageReaction) {
-      io.emit("send_new_reaction", imageReaction);
+    const reactions = imageReaction.reactionsusers;
+    let haha = [];
+    let like = [];
+    let grrr = [];
+    for (let i = 0; i < reactions.length; i++) {
+      // console.log(reactions[i]);
+      if (reactions[i].reaction === "haha") {
+        haha.push(reactions[i].reaction);
+      }
+      if (reactions[i].reaction === "like") {
+        like.push(reactions[i].reaction);
+      }
+      if (reactions[i].reaction === "grrr") {
+        grrr.push(reactions[i].reaction);
+      }
     }
+    //objet qui contient les objets des reactions
+    const imagereactions = {
+      haha: haha,
+      like: like,
+      grrr: grrr,
+    };
+    //on fusion l'objet de l'image récupéré avec l'objet des reactions
+    const imgDisplayShare = {
+      ...imageReaction,
+      reactions: imagereactions,
+    };
+    // console.log("==============socket ======================");
+    // console.log(imgDisplayShare);
+    // console.log("====================================");
+    io.emit("send_new_reaction", imgDisplayShare);
   });
 
   socket.on("catch_new_commentaire", async (data) => {
