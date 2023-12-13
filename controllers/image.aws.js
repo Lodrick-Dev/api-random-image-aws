@@ -177,6 +177,10 @@ module.exports.commentImage = async (req, res, next) => {
       .json({ message: "Erreur: Identification de l'image non réussie" });
   if (!emailuser)
     return res.status(200).json({ message: "Utilisateur non identifié" });
+  if (comment.length > 150)
+    return res
+      .status(200)
+      .json({ message: "Erreur: Nombre de cractères autorisés dépassé" });
 
   try {
     const image = await ImageModel.findById(idimgmongo);
