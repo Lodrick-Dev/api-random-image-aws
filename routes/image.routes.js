@@ -9,6 +9,7 @@ const {
   reactionUserOnImageSaveInMongo,
   commentImage,
   deleteMyCommentaire,
+  getAllImgFromMongo,
 } = require("../controllers/image.aws");
 const {
   checkTokenAndAllow,
@@ -49,6 +50,7 @@ router.post(
 router.delete("/admin/delete/image", checkTokenAndAllow, deleteImg);
 //ici aussi middleware
 router.get("/admin/all/images", getAll);
+router.get("/admin/all/images/mongo", checkTokenAndAllow, getAllImgFromMongo);
 
 // call on piece random - PUBLIC AWS / NOT USE
 router.get("/random/image", getOneRandom);

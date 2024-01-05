@@ -3,7 +3,15 @@ const adminFirebaseInit = require("./firebase");
 
 //ADMIN
 module.exports.checkTokenAndAllow = async (req, res, next) => {
-  const token = req.body.token || req.params.token || req.query.token;
+  // pour récupéré un token/data envoyé depuis le front
+  //avec la méthode get : req.headers.authorization
+  //ceci est est a mettre 'authorisation' dans le cors
+  //voir le fichier server.js
+  const token =
+    req.body.token ||
+    req.headers.authorization ||
+    req.params.token ||
+    req.query.token;
   if (!token)
     return res.status(200).json({ message: "Erreur : Token obligatoire" });
   try {

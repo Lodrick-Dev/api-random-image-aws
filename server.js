@@ -20,24 +20,24 @@ const app = express();
 //WESOCKEt
 // Créer le serveur HTTP à partir de l'application Express
 
-const allowedOrigins = ["http://localhost:3000/"];
+const allowedOrigins = ["http://localhost:3000"];
 
 //cors policy
 const corsOption = {
-  origin: "http://localhost:3000",
+  // origin: "http://10.0.2.2:8081",
   credentials: true,
-  allowedHeaders: ["sessionId", "Content-Type"],
+  allowedHeaders: ["Authorization", "sessionId", "Content-Type"],
   exposedHeaders: ["sessionId"],
   methods: "GET,HEAD,PUT,POST,DELETE",
   preflightContinue: false,
   optionsSuccessStatus: 204,
-  // origin: function (origin, callback) {
-  //   if (!origin || allowedOrigins.includes(origin)) {
-  //     callback(null, true);
-  //   } else {
-  //     callback(new Error("No, not allowed by Cors"));
-  //   }
-  // },
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("No, not allowed by Cors"));
+    }
+  },
 };
 app.use(cors(corsOption));
 // Attacher Socket.IO au serveur HTTP

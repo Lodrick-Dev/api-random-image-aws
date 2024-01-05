@@ -75,6 +75,21 @@ module.exports.getAll = async (req, res) => {
   }
 };
 
+//get all image from mongo
+module.exports.getAllImgFromMongo = async (req, res) => {
+  try {
+    const all = await ImageModel.find();
+    return res.status(200).send(all);
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(200)
+      .json({
+        message: "Erreur, lors de la récupération de toutes les images",
+      });
+  }
+};
+
 //get random
 module.exports.getOneRandom = async (req, res) => {
   try {
