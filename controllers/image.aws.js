@@ -37,18 +37,25 @@ module.exports.uploadImg = async (req, res) => {
 
 //delete image
 module.exports.deleteImg = async (req, res) => {
-  const { namemongo, nameaws } = req.body;
-  if (!namemongo || !nameaws)
-    return res.status(200).json({ message: `Le nom est introuvable` });
+  // const { namemongo, nameaws } = req.body;
+  const { id } = req.body;
+  if (!id) return res.status(200).json({ message: `Le nom est introuvable` });
   try {
-    const image = await ImageModel.findOne({ nameimage: namemongo });
+    // const image = await ImageModel.findOne({ nameimage: namemongo });
+
+    // console.log(image);
+    // return;
+    const image = await ImageModel.findById(id);
     if (!image)
       return res
         .status(200)
         .json({ message: "Erreur : Objet non trouvé dans la base de donnée" });
+
+    const lastSlash = image.nameimage.lastIndexOf("/");
+    const keyaws = image.nameimage.substring(lastSlash + 1);
     const deleteInAwsAndDataBase = async () => {
       try {
-        await deleteImgAws(nameaws);
+        await deleteImgAws(keyaws);
         await image.deleteOne();
         return res.status(200).json({ message: "Image supprimée avec succès" });
       } catch (error) {
@@ -82,11 +89,9 @@ module.exports.getAllImgFromMongo = async (req, res) => {
     return res.status(200).send(all);
   } catch (error) {
     console.log(error);
-    return res
-      .status(200)
-      .json({
-        message: "Erreur, lors de la récupération de toutes les images",
-      });
+    return res.status(200).json({
+      message: "Erreur, lors de la récupération de toutes les images",
+    });
   }
 };
 

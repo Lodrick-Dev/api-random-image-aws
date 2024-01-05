@@ -27,7 +27,7 @@ module.exports.getUserId = async (req, res) => {
   }
 };
 
-//get /user findUser in mongo
+//get /user findUser in mongo with id
 module.exports.findUserMongo = async (req, res) => {
   const { id } = req.params;
   if (!id)
@@ -226,7 +226,26 @@ module.exports.updateUser = async (req, res) => {
   }
 };
 
-//get /email get user by email to ADMIN
+//get find user by email in mongo
+module.exports.getUserByEmailFromMongo = async (req, res) => {
+  const { email } = req.query;
+  if (!email)
+    return res.status(200).json({ message: "Erreur: Email non trouvé" });
+  try {
+    const user = await UserModel.find({ email: email });
+    if (user.length === 0) {
+      return res
+        .status(200)
+        .json({ message: "Erreur : Utilisateur n'existe pas" });
+    }
+    if (user) return res.status(200).json(user);
+  } catch (error) {
+    console.log(error);
+    res.status(200).json({ message: "Erreur: echec lors de la recherche " });
+  }
+};
+
+//get /email get user by email to ADMIN - Firebase
 module.exports.getUserByEmailSend = async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(200).json({ message: "Champs obligatoire" });
@@ -241,8 +260,8 @@ module.exports.getUserByEmailSend = async (req, res) => {
   }
 };
 
-//get /all alluser to ADMIN
-module.exports.getAllUsers = async (req, res) => {
+//get /all alluser to ADMIN to Firebase Base
+module.exports.getAllUsersFromFireBase = async (req, res) => {
   const listAllUsers = (nextPageToken) => {
     // List batch of users, 1000 at a time.
     adminFirebaseInit
