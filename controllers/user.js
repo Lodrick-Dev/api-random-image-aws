@@ -158,7 +158,7 @@ module.exports.updateUser = async (req, res) => {
   }
   //pour mettre une bio
   if (biographie) {
-    if (bio.length > 110)
+    if (biographie.length > 110)
       return res
         .status(200)
         .json({ message: "Erreur: Nombre de cractères autorisés dépassé" });
