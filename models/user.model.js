@@ -41,6 +41,9 @@ const userSchema = new mongoose.Schema({
     ],
     default: [],
   },
+  profileimage: {
+    type: String,
+  },
 });
 
 //user est le nom de la table dans la dataBase

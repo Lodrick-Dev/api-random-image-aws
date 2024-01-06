@@ -318,6 +318,17 @@ module.exports.deleteUser = async (req, res) => {
       return res
         .status(200)
         .json({ message: "Erreur : Email non trouvé dans mongoDB" });
+
+    //👇 temporaire
+    // await adminFirebaseInit
+    //   .auth()
+    //   .deleteUser(id)
+    //   .then(() => {
+    //     return res.status(200).json({
+    //       message: `Utilisateur : ${email} avec l'id : ${id} supprimé avec succès`,
+    //     });
+    //   });
+    //👆 temporaire
     const deleteUserInAwsThenMongo = async () => {
       try {
         await adminFirebaseInit.auth().deleteUser(id);
