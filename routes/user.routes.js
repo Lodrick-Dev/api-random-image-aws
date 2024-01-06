@@ -24,6 +24,6 @@ router.get("/all", checkTokenAndAllow, getAllUsersFromFireBase);
 router.get("/email/mongo", checkTokenAndAllow, getUserByEmailFromMongo); // in mongo
 // router.get("/email/mongo", getUserByEmailFromMongo); // in mongo
 router.delete("/delete", checkTokenAndAllow, deleteUser);
-router.delete("/current/delete", deleteUserCurrent); //un middleware avec le token ici
+router.delete("/current/delete", checkTokenPublic, deleteUserCurrent); //un middleware avec le token ici
 
 module.exports = router;
